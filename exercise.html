@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	
+	<script>
+		/*
+		*js：基于对象
+		*面向对象：仿java
+		*/
+		//构造函数
+		var obj=new Object();
+		obj.name='tom';
+		obj.age=2;
+		obj.sayName=function(){
+			console.log(this.name);
+		}
+		obj.sayName();
+
+		//对象字面量
+		var obj1={
+			name:'tom1',
+			age:3,
+			sayName(){
+				console.log(this.name);
+			}
+		}
+		obj1.sayName();
+
+		//工厂模式:解决了代码冗余问题，但是不能区分类型
+		function cat(name,age){
+			var o=new Object();
+			o.name=name;
+			o.age=age;
+			o.sayName=function(){
+				console.log(this.name);
+			}
+			return o;
+		}
+		var cat1=cat('jerry',9);
+		cat1.sayName();
+
+		//构造函数模式：能区分类型
+
+		//自创构造函数，利用函数模拟类
+		function Cat(name,age){
+			this.name=name;
+			this.age=age;
+			this.sayName=function(){
+				console.log(`cat ${this.name}`);
+			}
+		}
+		function Dog(name,age){
+			this.name=name;
+			this.age=age;
+			this.sayName=function(){
+				console.log(`dog ${this.name}`);
+			}
+		}
+
+		var cat2=new Cat('lili',7);//构造函数调用，得到实例
+		cat2.sayName();
+
+		var dog=new Dog('lucy',3);
+		dog.sayName();
+
+		//原型模式
+		function Pig(){};
+
+		Pig.prototype.name='tom';
+		Pig.prototype.age=3;
+		Pig.prototype.sayName=function(){
+			console.log(this.name);
+		}
+
+		var pig1=new Pig();
+		pig1.sayName();//'tom'
+
+		//可以直接给实例赋属性值，访问时优先访问实例中的属性
+		var pig2=new Pig();
+		pig2.name='lily';
+		pig2.age=0;
+		pig2.sayName();//'lily'
+
+
+		//也可以这么写，必须说明指向
+		function Chic(){};
+
+		Chic.prototype={
+			constructor:Chic,//因为重写了原型对象，丢失了实例与新原型之间的关系，必须说明指向 
+			name:'lily',
+			age:9,
+			sayName:function(){
+				console.log(this.name);
+			}
+		}
+
+		var chic=new Chic();//一定要先重写原型，后实例化
+		chic.sayName();
+
+
+
+		//原生对象模型（不建议）
+		String.prototype.sayHi=function(){
+			console.log('hello!');
+		}
+		var str='tom';
+		str.sayHi();
+
+		//原型对象过度共享问题
+		function Cow(){};
+		Cow.prototype={
+			friend:['小明','小红']
+		}
+		var cow1=new Cow();
+		var cow2=new Cow();
+
+		cow1.friend.push('小黑');
+
+		console.log(cow1.friend);//'["小明", "小红", "小黑"]'
+		console.log(cow2.friend);//'["小明", "小红", "小黑"]',导致小黑被加到所有实例上了
+
+
+		//构造函数+原型模式===》解决过度共享问题
+		function Roo(){//构造函数里面放实例属性（私有的）
+			this.friend=['小红'];
+		}
+		Roo.prototype.sayName=function(){//原型对象里面放共享的属性及方法
+			console.log(this.name);
+		}
+
+		var roo1=new Roo();
+		var roo2=new Roo();
+
+		roo1.friend.push('小明');
+
+		console.log(roo1.friend);//'["小红", "小明"]'
+		console.log(roo2.friend);//'["小红"]'
+
+		/*原型链（继承的主要方法）
+		*主要思想：让一个引用类型继承另一个引用类型的属性
+		*查找顺序：当前实例属性->实例的原型->父级的原型对象(找不到就报错)->是Object的实例
+		*/
+		function Sup(){
+			this.name='tom';
+		}
+		Sup.prototype={
+			sayName:function(){
+				console.log(this.name);
+			}
+		}
+		
+		function Sub(){
+			this.name='nana';
+		}
+
+		Sub.prototype = new Sup();//子级原型对象代替父级的实例，指向父级的原型对象
+
+		var sub=new Sub();
+		sub.sayName();//'nana',成功调用了父级的方法
+
+	</script>
+
+
+</body>
+</html>
